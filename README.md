@@ -37,7 +37,7 @@ This will use the standard local configuration for auth etc
         
         doSomethingWithMessage (message);
         
-        return "message received;
+        return "message received"; // will return status 200 meaning received okay
     }
 
 
