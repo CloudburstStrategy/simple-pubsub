@@ -39,11 +39,6 @@ This will use the standard local configuration for auth etc
         
         return "message received;
     }
-    
-    
-    
-    
-
 
 
 ## To Release new version to Bintray
