@@ -124,6 +124,21 @@ public class SimplePubSub {
         }
     }
 
+    /**
+     * Encode messageObject as base64 encoded json and then publish using a backgroud thread
+     * @param topicAlias
+     * @param messageObject
+     */
+    public void publishMessageAsync (final String topicAlias, final Object messageObject) {
+        executor.execute(() -> publishEncodedPayload(topicAlias,JsonUtils.encode(messageObject)));
+    }
+
+    /**
+     * Encode payload as base64 encoded json and then publish
+     * @param topicAlias
+     * @param messageObject
+     * @return
+     */
     public String publishMessage (String topicAlias, Object messageObject) {
         return publishEncodedPayload(topicAlias, JsonUtils.encode(messageObject));
     }
