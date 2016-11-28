@@ -9,6 +9,6 @@ before_install:
 - openssl aes-256-cbc -K $encrypted_e43fc203f982_key -iv $encrypted_e43fc203f982_iv
   -in paxportcloud-travis-ci.json.enc -out paxportcloud-travis-ci.json -d
 - if [ ! -d $HOME/google-cloud-sdk ]; then
-    curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-135.0.0-linux-x86_64.tar.gz -o gcloudsdk.tar.gz; tar -xvzf gcloudsdk.tar.gz; ./google-cloud-sdk/install.sh --quiet; ./google-cloud-sdk/bin/gcloud init --quiet;
+    curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-135.0.0-linux-x86_64.tar.gz -o gcloudsdk.tar.gz; tar -xvzf gcloudsdk.tar.gz; ./google-cloud-sdk/install.sh --quiet; ./google-cloud-sdk/bin/gcloud init;
   fi
 - gcloud auth activate-service-account --key-file paxportcloud-travis-ci.json
