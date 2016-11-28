@@ -1,6 +1,8 @@
 Simple PubSub
 ===================
 
+<a href="https://travis-ci.org/paxport/simple-pubsub" target="_blank"><img src="https://api.travis-ci.org/paxport/simple-pubsub.svg?branch=master"/></a>
+
 Simplified API for interacting with Google Pub Sub
 
 ## Basic Usage
