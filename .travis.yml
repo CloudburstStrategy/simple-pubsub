@@ -11,4 +11,4 @@ before_install:
 - if [ ! -d $HOME/google-cloud-sdk ]; then
     curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-135.0.0-linux-x86_64.tar.gz -o gcloudsdk.tar.gz; tar -xvzf gcloudsdk.tar.gz; ./google-cloud-sdk/install.sh --quiet;
   fi
-- gcloud auth activate-service-account --key-file paxportcloud-travis-ci.json
+- ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file paxportcloud-travis-ci.json
