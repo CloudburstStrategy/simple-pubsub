@@ -1,0 +1,14 @@
+sudo: false
+language: java
+jdk:
+- oraclejdk8
+cache:
+  directories:
+  - "$HOME/gcloud/"
+before_install:
+- openssl aes-256-cbc -K $encrypted_e43fc203f982_key -iv $encrypted_e43fc203f982_iv
+  -in paxportcloud-travis-ci.json.enc -out paxportcloud-travis-ci.json -d
+- if [ ! -d $HOME/google-cloud-sdk ]; then
+    curl https://sdk.cloud.google.com | bash;
+  fi
+- gcloud auth activate-service-account --key-file paxportcloud-travis-ci.json
