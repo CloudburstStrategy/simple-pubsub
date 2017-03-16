@@ -14,7 +14,7 @@ import com.google.api.services.pubsub.model.Subscription;
 import com.google.api.services.pubsub.model.Topic;
 import com.google.common.collect.ImmutableList;
 
-import com.paxport.json.JsonUtils;
+import com.cloudburst.json.JsonUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +130,7 @@ public class SimplePubSub {
      * @param messageObject
      */
     public void publishMessageAsync (final String topicAlias, final Object messageObject) {
-        executor.execute(() -> publishEncodedPayload(topicAlias,JsonUtils.encode(messageObject)));
+        executor.execute(() -> publishEncodedPayload(topicAlias, JsonUtils.encode(messageObject)));
     }
 
     /**
