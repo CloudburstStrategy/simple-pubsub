@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.paxport</groupId>
+	<groupId>com.cloudburst</groupId>
 	<artifactId>simple-pubsub</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<repositories>
@@ -17,9 +17,9 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-			<id>paxport-maven</id>
-			<name>paxport-maven</name>
-			<url>http://paxportuk.bintray.com/maven</url>
+			<id>bintray-cloudburst-maven</id>
+			<name>bintray</name>
+			<url>http://dl.bintray.com/cloudburst/maven</url>
 		</repository>
 	</repositories>
 
@@ -52,9 +52,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.paxport</groupId>
+			<groupId>com.cloudburst</groupId>
 			<artifactId>json-utils</artifactId>
-			<version>1.0.2</version>
+			<version>1.1.1</version>
 		</dependency>
 
 		<dependency>
@@ -88,16 +88,16 @@
 
 	<distributionManagement>
 		<repository>
-			<id>bintray-paxportuk-maven</id>
-			<name>paxportuk-maven</name>
-			<url>https://api.bintray.com/maven/paxportuk/maven/com.paxport.simple-pubsub/;publish=1</url>
+			<id>bintray-cloudburst-maven</id>
+			<name>cloudburst-maven</name>
+			<url>https://api.bintray.com/maven/cloudburst/maven/com.cloudburst.simple-pubsub/;publish=1</url>
 		</repository>
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/paxport/simple-pubsub.git</connection>
-		<developerConnection>scm:git:git@github.com:paxport/simple-pubsub.git</developerConnection>
-		<url>https://github.com/paxport/simple-pubsub.git</url>
+		<connection>scm:git:https://github.com/CloudburstStrategy/simple-pubsub.git</connection>
+		<developerConnection>scm:git:git@github.com:CloudburstStrategy/simple-pubsub.git</developerConnection>
+		<url>https://github.com/CloudburstStrategy/simple-pubsub.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
