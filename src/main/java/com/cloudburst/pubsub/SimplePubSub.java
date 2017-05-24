@@ -1,4 +1,4 @@
-package com.paxport.pubsub;
+package com.cloudburst.pubsub;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.pubsub.Pubsub;
