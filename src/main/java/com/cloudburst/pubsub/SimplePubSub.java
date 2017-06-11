@@ -46,6 +46,10 @@ public class SimplePubSub {
 
     private ExecutorService executor = Executors.newFixedThreadPool(5);
 
+    private boolean keepGoing = true;
+
+    private int shutdownTimeoutSecs = 300;
+
     public SimplePubSub(String projectName) {
         this.projectName = projectName;
     }
@@ -180,13 +184,16 @@ public class SimplePubSub {
     }
 
     public Subscription ensurePullSubscription(String topicAlias, String subscriptionAlias) {
-        ensureTopic(topicAlias);
-        Optional<Subscription> sub = fetchSubscription(subscriptionAlias);
-        return sub.orElseGet(() -> createPullSubscription(topicAlias,subscriptionAlias));
+        return ensurePullSubscription(topicAlias,subscriptionAlias,10);
     }
 
-    public Subscription createPullSubscription(String topicAlias, String subscriptionAlias) {
-        return createSubscription(topicAlias,subscriptionAlias,10,null);
+    public Subscription ensurePullSubscription(String topicAlias, String subscriptionAlias, int ackDeadlineSecs) {
+        Optional<Subscription> sub = fetchSubscription(subscriptionAlias);
+        return sub.orElseGet(() -> createPullSubscription(topicAlias,subscriptionAlias, ackDeadlineSecs));
+    }
+
+    public Subscription createPullSubscription(String topicAlias, String subscriptionAlias, int ackDeadlineSecs) {
+        return createSubscription(topicAlias,subscriptionAlias,ackDeadlineSecs,null);
     }
 
     public Subscription createSubscription(String topicAlias, String subscriptionAlias, int ackDeadlineSecs, PushConfig pushConfig){
@@ -302,12 +309,60 @@ public class SimplePubSub {
         return acknowledge(subscriptionAlias,ackIds);
     }
 
+    /**
+     * Subscribe the given job to be run whenever a new message is available on the given topic
+     * @param topicAlias
+     * @param subAlias
+     * @param ackDeadlineSecs
+     * @param job
+     */
+    public void registerSerialJob (String topicAlias, String subAlias, int ackDeadlineSecs, ReceivedMessageJob job){
+        Subscription sub = ensurePullSubscription(topicAlias,subAlias,ackDeadlineSecs);
+        executor.execute(() -> {
+            while (keepGoing){
+                logger.info("Registering serial message job for topic " + topicAlias + " --> " + subAlias);
+                try{
+                    List<ReceivedMessage> msgs = pullMessages(subAlias,1,true,10);
+                    if (!msgs.isEmpty() ){
+                        for (ReceivedMessage msg : msgs) {
+                            if ( job.run(msg) ){
+                                acknowledge(subAlias,msg);
+                            }
+                        }
+                    }
+                }
+                catch (Throwable t){
+                    logger.error("serial job " + subAlias + " problem",t);
+                }
+            }
+        });
+    }
+
     public void shutdown() {
         try {
+            keepGoing = false;
             executor.shutdown();
-            executor.awaitTermination(60, TimeUnit.SECONDS);
+            executor.awaitTermination(300, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public SimplePubSub setProjectName(String projectName) {
+        this.projectName = projectName;
+        return this;
+    }
+
+    public int getShutdownTimeoutSecs() {
+        return shutdownTimeoutSecs;
+    }
+
+    public SimplePubSub setShutdownTimeoutSecs(int shutdownTimeoutSecs) {
+        this.shutdownTimeoutSecs = shutdownTimeoutSecs;
+        return this;
     }
 }
