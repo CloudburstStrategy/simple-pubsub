@@ -317,10 +317,10 @@ public class SimplePubSub {
      * @param job
      */
     public void registerSerialJob (String topicAlias, String subAlias, int ackDeadlineSecs, ReceivedMessageJob job){
+        logger.info("Registering serial message job for topic " + topicAlias + " --> " + subAlias);
         Subscription sub = ensurePullSubscription(topicAlias,subAlias,ackDeadlineSecs);
         executor.execute(() -> {
             while (keepGoing){
-                logger.info("Registering serial message job for topic " + topicAlias + " --> " + subAlias);
                 try{
                     List<ReceivedMessage> msgs = pullMessages(subAlias,1,true,10);
                     if (!msgs.isEmpty() ){
