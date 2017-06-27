@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -235,7 +234,7 @@ public class SimplePubSub {
         return "projects/" + projectName + "/subscriptions/" + subAlias;
     }
 
-    public List<ReceivedMessage> pullMessages(String subscriptionAlias, int batchSize, boolean waitForMessages, long timeoutSecs) {
+    public List<ReceivedMessage> pullMessages(String subscriptionAlias, int batchSize, boolean waitForMessages) {
         try {
             String subscriptionName = subPath(subscriptionAlias);
             PullRequest pullRequest = new PullRequest()
@@ -244,7 +243,6 @@ public class SimplePubSub {
 
             PullResponse pullResponse = subs().pull(subscriptionName, pullRequest).execute();
             List<ReceivedMessage> receivedMessages = pullResponse.getReceivedMessages();
-            List<ReceivedMessage> result = new ArrayList<>();
             if (receivedMessages == null || receivedMessages.isEmpty()) {
                 // The result was empty.
                 logger.debug("There were no messages pulled from subscription " + subscriptionAlias );
@@ -252,23 +250,8 @@ public class SimplePubSub {
             }
             else {
                 logger.debug("Pulled " + receivedMessages.size() + " message(s) from " + subscriptionName );
-                List<String> timeoutAcks = new ArrayList<>();
-                ZonedDateTime timeoutBefore = ZonedDateTime.now().minusSeconds(timeoutSecs);
-                for (ReceivedMessage rm : receivedMessages) {
-                    ZonedDateTime messageSent = ZonedDateTime.parse(rm.getMessage().getPublishTime());
-                    if ( messageSent.isBefore(timeoutBefore) ) {
-                        timeoutAcks.add(rm.getAckId());
-                    }
-                    else{
-                        result.add(rm);
-                    }
-                }
-                if ( !timeoutAcks.isEmpty() ) {
-                    logger.info("Auto acknowledging " + timeoutAcks.size() + " timed out message(s)");
-                    acknowledge(subscriptionAlias,timeoutAcks);
-                }
+                return receivedMessages;
             }
-            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -322,7 +305,7 @@ public class SimplePubSub {
         executor.execute(() -> {
             while (keepGoing){
                 try{
-                    List<ReceivedMessage> msgs = pullMessages(subAlias,1,true,10);
+                    List<ReceivedMessage> msgs = pullMessages(subAlias,1,true);
                     if (!msgs.isEmpty() ){
                         for (ReceivedMessage msg : msgs) {
                             if ( job.run(msg) ){
