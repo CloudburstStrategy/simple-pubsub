@@ -267,8 +267,9 @@ public class SimplePubSub {
                 String subscriptionName = subPath(subscriptionAlias);
                 AcknowledgeRequest ackRequest = new AcknowledgeRequest().setAckIds(ackIds);
                 subs().acknowledge(subscriptionName, ackRequest).execute();
-                logger.debug("" + subscriptionName + " acknowledged the following ackIds " + ackIds);
-
+                if ( logger.isDebugEnabled() ){
+                    logger.debug("" + subscriptionName + " acknowledged the following ackIds " + ackIds);
+                }
             } catch (IOException e) {
                 logger.error("Failed to acknowledge " + subscriptionAlias + " ids: " + ackIds, e );
             }
@@ -301,24 +302,27 @@ public class SimplePubSub {
      */
     public void registerSerialJob (String topicAlias, String subAlias, int ackDeadlineSecs, ReceivedMessageJob job){
         logger.info("Registering serial message job for topic " + topicAlias + " --> " + subAlias);
+
         Subscription sub = ensurePullSubscription(topicAlias,subAlias,ackDeadlineSecs);
-        executor.execute(() -> {
-            while (keepGoing){
-                try{
-                    List<ReceivedMessage> msgs = pullMessages(subAlias,1,true);
-                    if (!msgs.isEmpty() ){
+        String name = "pubsub-pull-from-" + topicAlias + "-with-" + subAlias;
+        Thread jobThread = new Thread(() -> {
+            while (keepGoing) {
+                try {
+                    List<ReceivedMessage> msgs = pullMessages(subAlias, 1, true);
+                    if (!msgs.isEmpty()) {
                         for (ReceivedMessage msg : msgs) {
-                            if ( job.run(msg) ){
-                                acknowledge(subAlias,msg);
+                            if (job.run(msg)) {
+                                acknowledge(subAlias, msg);
                             }
                         }
                     }
-                }
-                catch (Throwable t){
-                    logger.error("serial job " + subAlias + " problem",t);
+                } catch (Throwable t) {
+                    logger.error("serial job " + subAlias + " problem", t);
                 }
             }
-        });
+        }, name);
+        logger.info("Starting new thread with name: " + name);
+        jobThread.start();
     }
 
     public void shutdown() {
@@ -348,4 +352,9 @@ public class SimplePubSub {
         this.shutdownTimeoutSecs = shutdownTimeoutSecs;
         return this;
     }
+
+    public void setExecutor(ExecutorService es){
+        this.executor = es;
+    }
+
 }
